@@ -23,10 +23,19 @@ public class TodoService {
     }
 
     public TodoItem updateTodoItem(TodoItem todoItem) {
-        Integer todoItemId = todoItem.getId();
+        validateItemIdExist(todoItem.getId());
+        return todoRepository.save(todoItem);
+    }
+
+    private void validateItemIdExist(Integer todoItemId) {
         if (todoItemId == null || !todoRepository.existsById(todoItemId)) {
             throw new TodoItemNotFoundException("Todo item not found");
         }
-        return todoRepository.save(todoItem);
+    }
+
+    public TodoItem deleteTodoItem(Integer todoItemId) {
+        validateItemIdExist(todoItemId);
+        todoRepository.deleteById(todoItemId);
+        return new TodoItem(todoItemId, null, null);
     }
 }

@@ -1,6 +1,7 @@
 package com.todo.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.todo.entity.TodoItem;
 import com.todo.repository.TodoRepository;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -87,6 +89,35 @@ public class TodoControllerTest {
         String responseJSON = client.perform(MockMvcRequestBuilders.put("/todo/todoItem/" + updateItem.getId())
                 .contentType("application/json")
                 .content(todoItemJacksonTester.write(updateItem).getJson()))
+                .andReturn().getResponse().getContentAsString();
+        // Then
+        assertThat(responseJSON).contains("Todo item not found");
+    }
+
+    @Test
+    @Transactional
+    public void should_return_deleted_todo_item_when_delete_todo_item() throws Exception {
+        // Given
+        TodoItem todoItem = new TodoItem("test", false);
+        TodoItem savedTodoItem = todoRepository.save(todoItem);
+        Integer deleteTodoItemId = savedTodoItem.getId();
+        // When
+        String responseJSON = client.perform(MockMvcRequestBuilders.delete("/todo/todoItem/" + deleteTodoItemId))
+                .andReturn().getResponse().getContentAsString();
+        // Then
+        TodoItem todoItemResponse = todoItemJacksonTester.parseObject(responseJSON);
+        assertEquals(deleteTodoItemId, todoItemResponse.getId());
+
+    }
+
+    @Test
+    @Transactional
+    public void should_return_exception_when_delete_todo_item_not_found() throws Exception {
+        // Given
+        Integer wrongId = 9999;
+        TodoItem updateItem = new TodoItem(wrongId, "test", false);
+        // When
+        String responseJSON = client.perform(MockMvcRequestBuilders.delete("/todo/todoItem/" + updateItem.getId()))
                 .andReturn().getResponse().getContentAsString();
         // Then
         assertThat(responseJSON).contains("Todo item not found");

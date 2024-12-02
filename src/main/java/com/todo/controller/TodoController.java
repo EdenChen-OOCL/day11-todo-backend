@@ -4,6 +4,7 @@ import com.todo.entity.TodoItem;
 import com.todo.service.TodoService;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,5 +38,10 @@ public class TodoController {
     public ResponseEntity<TodoItem> updateTodoItem(@PathVariable Integer id, @RequestBody TodoItem todoItem) {
         todoItem.setId(id);
         return ResponseEntity.ok(todoService.updateTodoItem(todoItem));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<TodoItem> deleteTodoItem(@PathVariable Integer id) {
+        return ResponseEntity.ok(todoService.deleteTodoItem(id));
     }
 }
