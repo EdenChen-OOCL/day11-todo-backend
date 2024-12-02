@@ -1,6 +1,7 @@
 package com.todo.service;
 
 import com.todo.entity.TodoItem;
+import com.todo.exception.TodoItemNotFoundException;
 import com.todo.repository.TodoRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,14 @@ public class TodoService {
     }
 
     public TodoItem addTodo(TodoItem todoItem) {
+        return todoRepository.save(todoItem);
+    }
+
+    public TodoItem updateTodoItem(TodoItem todoItem) {
+        Integer todoItemId = todoItem.getId();
+        if (todoItemId == null || !todoRepository.existsById(todoItemId)) {
+            throw new TodoItemNotFoundException("Todo item not found");
+        }
         return todoRepository.save(todoItem);
     }
 }

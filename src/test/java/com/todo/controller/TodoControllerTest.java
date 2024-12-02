@@ -59,4 +59,37 @@ public class TodoControllerTest {
         assertThat(expectData).usingRecursiveComparison().ignoringFields("id").isEqualTo(todoItemResponse);
     }
 
+    @Test
+    public void should_return_updated_todo_item_when_update_todo_item() throws Exception {
+        // Given
+        TodoItem todoItem = new TodoItem("test", false);
+        TodoItem savedTodoItem = todoRepository.save(todoItem);
+
+        TodoItem updateItem = new TodoItem(savedTodoItem.getId(), "test", false);
+        updateItem.setText("new Test");
+        updateItem.setDone(false);
+        // When
+        String responseJSON = client.perform(MockMvcRequestBuilders.put("/todo/todoItem/" + updateItem.getId())
+                .contentType("application/json")
+                .content(todoItemJacksonTester.write(updateItem).getJson()))
+                .andReturn().getResponse().getContentAsString();
+        // Then
+        TodoItem todoItemResponse = todoItemJacksonTester.parseObject(responseJSON);
+        assertThat(updateItem).usingRecursiveComparison().isEqualTo(todoItemResponse);
+    }
+
+    @Test
+    public void should_return_exception_when_update_todo_item_not_found() throws Exception {
+        // Given
+        Integer wrongId = 9999;
+        TodoItem updateItem = new TodoItem(wrongId, "test", false);
+        // When
+        String responseJSON = client.perform(MockMvcRequestBuilders.put("/todo/todoItem/" + updateItem.getId())
+                .contentType("application/json")
+                .content(todoItemJacksonTester.write(updateItem).getJson()))
+                .andReturn().getResponse().getContentAsString();
+        // Then
+        assertThat(responseJSON).contains("Todo item not found");
+    }
+
 }
