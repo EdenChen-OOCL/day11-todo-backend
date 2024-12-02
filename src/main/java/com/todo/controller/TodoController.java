@@ -1,6 +1,7 @@
 package com.todo.controller;
 
 import com.todo.entity.TodoItem;
+import com.todo.service.TodoService;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,9 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/todo/todoItem")
 public class TodoController {
 
+    private final TodoService todoService;
+
+    public TodoController(TodoService todoService) {
+        this.todoService = todoService;
+    }
+
     @GetMapping("")
     public ResponseEntity<List<TodoItem>> getTodos() {
-        TodoItem todoItem = new TodoItem(1, "Buy milk", false);
-        return ResponseEntity.ok(List.of(todoItem));
+        List<TodoItem> todoItems = todoService.getTodoItems();
+        return ResponseEntity.ok(todoItems);
     }
 }
