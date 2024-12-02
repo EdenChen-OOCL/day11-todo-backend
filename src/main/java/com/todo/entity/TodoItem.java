@@ -17,6 +17,10 @@ public class TodoItem {
     public TodoItem() {
     }
 
+    public TodoItem(String text, Boolean done) {
+        this(null, text, done);
+    }
+
     public TodoItem(Integer id, String text, Boolean done) {
         this.id = id;
         this.text = text;

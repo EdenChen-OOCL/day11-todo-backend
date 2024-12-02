@@ -29,6 +29,8 @@ public class TodoControllerTest {
     @Autowired
     private JacksonTester<List<TodoItem>> todoItemListJacksonTester;
     @Autowired
+    private JacksonTester<TodoItem> todoItemJacksonTester;
+    @Autowired
     private TodoRepository todoRepository;
 
     @Test
@@ -41,6 +43,20 @@ public class TodoControllerTest {
         // Then
         List<TodoItem> todoItems = todoItemListJacksonTester.parseObject(responseJSON);
         assertThat(expectData).usingRecursiveComparison().isEqualTo(todoItems);
+    }
+
+    @Test
+    public void should_return_new_todo_item_when_add_todo_item() throws Exception {
+        // Given
+        TodoItem expectData = new TodoItem("test", false);
+        // When
+        String responseJSON = client.perform(MockMvcRequestBuilders.post("/todo/todoItem")
+                .contentType("application/json")
+                .content(todoItemJacksonTester.write(expectData).getJson()))
+                .andReturn().getResponse().getContentAsString();
+        // Then
+        TodoItem todoItemResponse = todoItemJacksonTester.parseObject(responseJSON);
+        assertThat(expectData).usingRecursiveComparison().ignoringFields("id").isEqualTo(todoItemResponse);
     }
 
 }
