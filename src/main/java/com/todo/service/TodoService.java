@@ -29,7 +29,7 @@ public class TodoService {
 
     private void validateItemIdExist(Integer todoItemId) {
         if (todoItemId == null || !todoRepository.existsById(todoItemId)) {
-            throw new TodoItemNotFoundException("Todo item not found");
+            throw new TodoItemNotFoundException();
         }
     }
 
