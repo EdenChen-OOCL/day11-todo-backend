@@ -27,8 +27,6 @@ public class TodoControllerTest {
     @Autowired
     private MockMvc client;
     @Autowired
-    private TodoService todoService;
-    @Autowired
     private JacksonTester<List<TodoItem>> todoItemListJacksonTester;
     @Autowired
     private JacksonTester<TodoItem> todoItemJacksonTester;
@@ -69,7 +67,7 @@ public class TodoControllerTest {
 
         TodoItem updateItem = new TodoItem(savedTodoItem.getId(), "test", false);
         updateItem.setText("new Test");
-        updateItem.setDone(false);
+        updateItem.setDone(true);
         // When
         String responseJSON = client.perform(MockMvcRequestBuilders.put("/todo/todoItem/" + updateItem.getId())
                 .contentType("application/json")
@@ -100,12 +98,15 @@ public class TodoControllerTest {
         // Given
         TodoItem todoItem = new TodoItem("test", false);
         TodoItem savedTodoItem = todoRepository.save(todoItem);
+        List<TodoItem> expectAll = todoRepository.findAll();
         Integer deleteTodoItemId = savedTodoItem.getId();
         // When
         String responseJSON = client.perform(MockMvcRequestBuilders.delete("/todo/todoItem/" + deleteTodoItemId))
                 .andReturn().getResponse().getContentAsString();
+        List<TodoItem> newItems = todoRepository.findAll();
         // Then
         TodoItem todoItemResponse = todoItemJacksonTester.parseObject(responseJSON);
+        assertThat(expectAll.size() - 1).isEqualTo(newItems.size());
         assertEquals(deleteTodoItemId, todoItemResponse.getId());
 
     }

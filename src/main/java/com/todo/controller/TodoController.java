@@ -3,6 +3,7 @@ package com.todo.controller;
 import com.todo.entity.TodoItem;
 import com.todo.service.TodoService;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +32,7 @@ public class TodoController {
 
     @PostMapping("")
     public ResponseEntity<TodoItem> addTodo(@RequestBody TodoItem todoItem) {
-        return ResponseEntity.ok(todoService.addTodo(todoItem));
+        return ResponseEntity.status(HttpStatus.CREATED).body(todoService.addTodo(todoItem));
     }
 
     @PutMapping("/{id}")
